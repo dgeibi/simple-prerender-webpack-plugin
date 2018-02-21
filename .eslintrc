@@ -1,0 +1,6 @@
+{
+  "extends": "dgeibi",
+  "rules": {
+    "no-underscore-dangle": "off"
+  }
+}
