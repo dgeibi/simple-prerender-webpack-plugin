@@ -14,8 +14,9 @@ function SimplePrerenderWebpackPlugin({
   routes,
   config = 'webpack.config.js',
   getHtmlWebpackPluginOpts,
-  sourcemap = true,
   nodeExternalsOptions,
+  writeFile = false,
+  sourcemap = true,
 } = {}) {
   if (!Array.isArray(routes) || !routes[0]) {
     throw Error('expect paths to be array of string')
@@ -24,8 +25,9 @@ function SimplePrerenderWebpackPlugin({
     routes,
     config,
     entry,
-    sourcemap,
     nodeExternalsOptions,
+    writeFile,
+    sourcemap,
     getHtmlWebpackPluginOpts:
       typeof getHtmlWebpackPluginOpts === 'function'
         ? getHtmlWebpackPluginOpts
@@ -43,6 +45,7 @@ SimplePrerenderWebpackPlugin.prototype.apply = function apply(compiler) {
       getHtmlWebpackPluginOpts,
       routes,
       nodeExternalsOptions,
+      writeFile,
       sourcemap,
     } = this.opts
     let render
@@ -52,30 +55,36 @@ SimplePrerenderWebpackPlugin.prototype.apply = function apply(compiler) {
           config: interopRequire(config),
           entry,
           nodeExternalsOptions,
+          writeFile,
           sourcemap,
         })
       )
     } catch (error) {
       return callback(error)
     }
-
     if (typeof render !== 'function') {
       return callback(Error('entry should be function: (pathname) => any'))
     }
 
-    routes.forEach(pathname => {
-      const rendered = render(pathname)
+    for (let i = 0; i < routes.length; i += 1) {
+      const pathname = routes[i]
+      let rendered
+      try {
+        rendered = render(pathname)
+      } catch (e) {
+        return callback(e)
+      }
+
       const filename = getFilename(pathname)
-      const plugin = new HtmlWebpackPlugin(
+      new HtmlWebpackPlugin(
         Object.assign(
           {
             filename,
           },
           getHtmlWebpackPluginOpts(rendered, pathname)
         )
-      )
-      plugin.apply(compiler)
-    })
+      ).apply(compiler)
+    }
 
     return callback()
   })

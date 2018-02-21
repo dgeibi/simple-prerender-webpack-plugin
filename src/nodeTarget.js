@@ -1,6 +1,6 @@
-import { nodeExternals, webpack } from './peers'
+import { nodeExternals } from './peers'
 
-export default ({ nodeExternalsOptions, sourcemap } = {}) => {
+export default ({ nodeExternalsOptions } = {}) => {
   const config = {
     node: {
       console: false,
@@ -14,16 +14,6 @@ export default ({ nodeExternalsOptions, sourcemap } = {}) => {
     target: 'node',
     externals: [nodeExternals(nodeExternalsOptions)],
   }
-  if (sourcemap) {
-    config.devtool = 'sourcemap'
-    config.plugins = config.plugins || []
-    config.plugins.push(
-      new webpack.BannerPlugin({
-        banner: 'require("source-map-support").install();',
-        raw: true,
-        entryOnly: false,
-      })
-    )
-  }
+
   return config
 }

@@ -1,7 +1,9 @@
 import path from 'path'
 import vm from 'vm'
 import Module from 'module'
+import realFs from 'fs'
 
+import installSMS from './installSMS'
 import { MemoryFS, webpack } from './peers'
 import nodeTarget from './nodeTarget'
 import merge from './merge'
@@ -18,13 +20,16 @@ async function requireWithWebpack({
   entry,
   config,
   nodeExternalsOptions,
+  writeFile,
   sourcemap,
 }) {
   const fs = new MemoryFS()
-
-  const dirname = process.cwd()
-  const basename = 'anything.js'
-  const dist = path.join(dirname, basename)
+  let dirname = process.cwd()
+  let basename =
+    writeFile && typeof writeFile === 'string' ? writeFile : '.render.js'
+  const dist = path.resolve(dirname, basename)
+  dirname = path.dirname(dist)
+  basename = path.basename(dist)
 
   if (config) {
     validateWebpackConfig(config)
@@ -47,6 +52,11 @@ async function requireWithWebpack({
       },
     },
   ])
+
+  if (sourcemap) {
+    webpackConfig.devtool = 'sourcemap'
+  }
+
   const compiler = webpack(webpackConfig)
   compiler.outputFileSystem = fs
 
@@ -63,7 +73,26 @@ async function requireWithWebpack({
         )
         return
       }
+      let map
+      let mapFilename
       const srcCode = fs.readFileSync(dist, 'utf8')
+
+      if (sourcemap) {
+        mapFilename = `${dist}.map`
+        map = fs.readFileSync(mapFilename, 'utf8')
+        installSMS({
+          url: basename,
+          map,
+        })
+      }
+
+      if (writeFile) {
+        realFs.writeFileSync(dist, srcCode)
+        if (sourcemap) {
+          realFs.writeFileSync(mapFilename, map)
+        }
+      }
+
       const vmModule = { exports: {} }
       const script = new vm.Script(Module.wrap(srcCode))
 

@@ -7,7 +7,7 @@
 ```sh
 $ npm install --save-dev simple-prerender-webpack-plugin
 # install peer dependencies
-$ npm install --save-dev webpack extract-text-webpack-plugin html-webpack-plugin source-map-support
+$ npm install --save-dev webpack extract-text-webpack-plugin html-webpack-plugin
 ```
 
 ## Usage
@@ -40,6 +40,15 @@ module.exports = {
 
       // (optional): enable sourcemap
       sourcemap: true,
+
+      // (optional): whether write output into disk
+      // default: false
+      // value:
+      //    false   : disabled
+      //    true    : use default filename(`.render.js`)
+      //    <string>: use custom filename
+      // note: filename will be resolved with process.cwd()
+      writeFile: false,
 
       // (optional): opts passed to webpack-node-externals
       // see also https://www.npmjs.com/package/webpack-node-externals
