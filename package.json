@@ -1,6 +1,6 @@
 {
   "name": "simple-prerender-webpack-plugin",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "prerender with webpack and html-webpack-plugin",
   "main": "index.js",
   "scripts": {
