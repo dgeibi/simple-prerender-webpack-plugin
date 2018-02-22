@@ -11,6 +11,6 @@ const plugin = new SP({
   }),
 })
 
-runWebpack(plugin).then(html => {
+runWebpack(plugin).then(({ html }) => {
   tap.matchSnapshot(html)
 })

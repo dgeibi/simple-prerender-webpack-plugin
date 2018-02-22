@@ -1,7 +1,8 @@
 /* eslint-disable no-param-reassign */
-import { statSync, outputFile } from 'fs-extra'
+import { statSync } from 'fs'
 import { resolve } from 'path'
 
+import outputFile from './outputFile'
 import requireCWD from './requireCwd'
 import requireWithWebpack from './requireWithWebpack'
 import getFilename from './getFilename'
@@ -87,7 +88,12 @@ SimplePrerenderWebpackPlugin.prototype.apply = function apply(compiler) {
 
   compiler.plugin('run', (compilation, callback) => {
     resultPromise
-      .then(r => (this.opts.writeFile && r.result ? this.emitFile(r) : r))
+      .then(
+        r =>
+          this.opts.writeFile && r.result
+            ? this.emitFile(r, compiler.outputFileSystem)
+            : r
+      )
       .then(({ result, error }) => {
         if (error) throw error
         const { getHtmlWebpackPluginOpts, routes } = this.opts
@@ -117,11 +123,11 @@ SimplePrerenderWebpackPlugin.prototype.apply = function apply(compiler) {
   })
 }
 
-SimplePrerenderWebpackPlugin.prototype.emitFile = function emitFile(ref) {
+SimplePrerenderWebpackPlugin.prototype.emitFile = function emitFile(ref, fs) {
   const { filename, fileRaw, mapRaw, mapFilename } = ref.result
   return Promise.all([
-    outputFile(filename, fileRaw),
-    mapRaw !== undefined && outputFile(mapFilename, mapRaw),
+    outputFile(filename, fileRaw, fs),
+    mapRaw !== undefined && outputFile(mapFilename, mapRaw, fs),
   ])
     .then(() => ref)
     .catch(error => ({

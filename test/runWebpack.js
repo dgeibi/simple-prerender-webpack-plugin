@@ -26,11 +26,19 @@ module.exports = plugin => {
   return new Promise((resolve, reject) => {
     compiler.run((err, stats) => {
       if (err || stats.hasErrors()) {
-        reject(err || stats)
-        // eslint-disable-next-line
+        reject(
+          Object.assign(err || stats, {
+            fs,
+            outputPath,
+          })
+        )
         return
       }
-      resolve(fs.readFileSync(path.join(outputPath, 'index.html'), 'utf8'))
+      resolve({
+        fs,
+        outputPath,
+        html: fs.readFileSync(path.join(outputPath, 'index.html'), 'utf8'),
+      })
     })
   })
 }
