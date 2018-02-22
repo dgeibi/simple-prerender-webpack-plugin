@@ -1,7 +1,6 @@
 import path from 'path'
 import vm from 'vm'
 import Module from 'module'
-import realFs from 'fs'
 
 import installSMS from './installSMS'
 import { MemoryFS, webpack } from './peers'
@@ -9,31 +8,22 @@ import nodeTarget from './nodeTarget'
 import merge from './merge'
 import requireCwd from './requireCwd'
 
-const validateWebpackConfig = conf => {
-  const type = typeof conf
-  if (!conf || !(type === 'object' || type === 'function')) {
-    throw Error('config should be a function or a object')
-  }
-}
-
 async function requireWithWebpack({
   entry,
   config,
   nodeExternalsOptions,
   writeFile,
   sourcemap,
+  outputPath,
 }) {
   const fs = new MemoryFS()
-  let dirname = process.cwd()
-  let basename =
-    writeFile && typeof writeFile === 'string' ? writeFile : '.render.js'
-  const dist = path.resolve(dirname, basename)
-  dirname = path.dirname(dist)
-  basename = path.basename(dist)
-
-  if (config) {
-    validateWebpackConfig(config)
+  let filename = path.normalize(
+    writeFile && typeof writeFile === 'string' ? writeFile : 'prerender.js'
+  )
+  if (path.resolve(filename) === filename) {
+    filename = path.relative(outputPath, filename)
   }
+  const dist = path.join(outputPath, filename)
 
   const webpackConfig = await merge([
     nodeTarget({
@@ -41,13 +31,13 @@ async function requireWithWebpack({
       sourcemap,
     }),
     config,
-    entry && {
+    {
       entry,
     },
     {
       output: {
-        path: dirname,
-        filename: basename,
+        path: outputPath,
+        filename,
         libraryTarget: 'commonjs2',
       },
     },
@@ -64,47 +54,44 @@ async function requireWithWebpack({
     compiler.run((err, stats) => {
       if (err || stats.hasErrors()) {
         reject(err || stats)
-        // eslint-disable-next-line
-        console.log(
-          stats.toString({
-            chunks: false,
-            colors: true,
-          })
-        )
         return
       }
-      let map
-      let mapFilename
-      const srcCode = fs.readFileSync(dist, 'utf8')
+      let mapRaw
+      const fileRaw = fs.readFileSync(dist, 'utf8')
 
       if (sourcemap) {
-        mapFilename = `${dist}.map`
-        map = fs.readFileSync(mapFilename, 'utf8')
+        mapRaw = fs.readFileSync(`${dist}.map`, 'utf8')
         installSMS({
-          url: basename,
-          map,
+          url: filename,
+          map: mapRaw,
         })
       }
 
-      if (writeFile) {
-        realFs.writeFileSync(dist, srcCode)
-        if (sourcemap) {
-          realFs.writeFileSync(mapFilename, map)
-        }
+      const vmModule = { exports: {} }
+      const script = new vm.Script(Module.wrap(fileRaw))
+
+      let error
+      // exports, require, module, __filename, __dirname
+      try {
+        script.runInThisContext()(
+          vmModule.exports,
+          requireCwd,
+          vmModule,
+          dist,
+          outputPath
+        )
+      } catch (e) {
+        error = e
       }
 
-      const vmModule = { exports: {} }
-      const script = new vm.Script(Module.wrap(srcCode))
-
-      // exports, require, module, __filename, __dirname
-      script.runInThisContext()(
-        vmModule.exports,
-        requireCwd,
-        vmModule,
-        dist,
-        dirname
-      )
-      resolve(vmModule.exports)
+      resolve({
+        object: vmModule.exports.default || vmModule.exports,
+        error,
+        fileRaw,
+        filename: dist,
+        mapRaw,
+        mapFilename: sourcemap && `${dist}.map`,
+      })
     })
   })
 }

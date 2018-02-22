@@ -1,3 +1,7 @@
+/* eslint-disable no-param-reassign */
+import { statSync, outputFile } from 'fs-extra'
+import { resolve } from 'path'
+
 import requireCWD from './requireCwd'
 import requireWithWebpack from './requireWithWebpack'
 import getFilename from './getFilename'
@@ -7,20 +11,53 @@ const HtmlWebpackPlugin = requireCWD('html-webpack-plugin')
 const interopRequire = id =>
   typeof id === 'string' && id ? requireCWD(id) : id
 
-const interopDefault = obj => (obj && 'default' in obj ? obj.default : obj)
+const isFile = filepath => {
+  try {
+    return statSync(filepath).isFile()
+  } catch (e) {
+    return false
+  }
+}
 
 function SimplePrerenderWebpackPlugin({
   entry,
   routes,
-  config = 'webpack.config.js',
+  config,
   getHtmlWebpackPluginOpts,
   nodeExternalsOptions,
   writeFile = false,
   sourcemap = true,
 } = {}) {
+  const errorMsgs = []
   if (!Array.isArray(routes) || !routes[0]) {
-    throw Error('expect paths to be array of string')
+    errorMsgs.push('expect `routes` to be array of string')
   }
+
+  if (config !== undefined) {
+    try {
+      config = interopRequire(config)
+    } catch (e) {
+      errorMsgs.push(e.message)
+    }
+    const type = typeof config
+    if (!config || !(type === 'object' || type === 'function')) {
+      errorMsgs.push('`config` should be a function or a object')
+    }
+  }
+
+  if (!entry) {
+    errorMsgs.push('`entry` should be a string')
+  } else {
+    entry = resolve(entry)
+    if (!isFile(entry)) {
+      errorMsgs.push(`${entry} should be file`)
+    }
+  }
+
+  if (errorMsgs.length > 0) {
+    throw Error(errorMsgs.map(x => x.trim()).join('\n'))
+  }
+
   this.opts = {
     routes,
     config,
@@ -38,56 +75,58 @@ function SimplePrerenderWebpackPlugin({
 }
 
 SimplePrerenderWebpackPlugin.prototype.apply = function apply(compiler) {
-  compiler.plugin('run', async (c, callback) => {
-    const {
-      config,
-      entry,
-      getHtmlWebpackPluginOpts,
-      routes,
-      nodeExternalsOptions,
-      writeFile,
-      sourcemap,
-    } = this.opts
-    let render
-    try {
-      render = interopDefault(
-        await requireWithWebpack({
-          config: interopRequire(config),
-          entry,
-          nodeExternalsOptions,
-          writeFile,
-          sourcemap,
-        })
-      )
-    } catch (error) {
-      return callback(error)
-    }
-    if (typeof render !== 'function') {
-      return callback(Error('entry should be function: (pathname) => any'))
-    }
+  this.opts.outputPath = compiler.options.output.path
+  const resultPromise = requireWithWebpack(this.opts)
+    .then(result => ({
+      result,
+      error: result.error,
+    }))
+    .catch(error => ({
+      error,
+    }))
 
-    for (let i = 0; i < routes.length; i += 1) {
-      const pathname = routes[i]
-      let rendered
-      try {
-        rendered = render(pathname)
-      } catch (e) {
-        return callback(e)
-      }
+  compiler.plugin('run', (compilation, callback) => {
+    resultPromise
+      .then(r => (this.opts.writeFile && r.result ? this.emitFile(r) : r))
+      .then(({ result, error }) => {
+        if (error) throw error
+        const { getHtmlWebpackPluginOpts, routes } = this.opts
+        const render = result.object
+        if (typeof render !== 'function') {
+          throw Error('entry should be function: (pathname) => any')
+        }
 
-      const filename = getFilename(pathname)
-      new HtmlWebpackPlugin(
-        Object.assign(
-          {
-            filename,
-          },
-          getHtmlWebpackPluginOpts(rendered, pathname)
-        )
-      ).apply(compiler)
-    }
-
-    return callback()
+        for (let i = 0; i < routes.length; i += 1) {
+          const pathname = routes[i]
+          const rendered = render(pathname)
+          const filename = getFilename(pathname)
+          new HtmlWebpackPlugin(
+            Object.assign(
+              {
+                filename,
+              },
+              getHtmlWebpackPluginOpts(rendered, pathname)
+            )
+          ).apply(compiler)
+        }
+        callback()
+      })
+      .catch(error => {
+        callback(error)
+      })
   })
+}
+
+SimplePrerenderWebpackPlugin.prototype.emitFile = function emitFile(ref) {
+  const { filename, fileRaw, mapRaw, mapFilename } = ref.result
+  return Promise.all([
+    outputFile(filename, fileRaw),
+    mapRaw !== undefined && outputFile(mapFilename, mapRaw),
+  ])
+    .then(() => ref)
+    .catch(error => ({
+      error: ref.error || error,
+    }))
 }
 
 export default SimplePrerenderWebpackPlugin

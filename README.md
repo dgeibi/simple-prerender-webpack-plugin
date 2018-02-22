@@ -7,7 +7,7 @@
 ```sh
 $ npm install --save-dev simple-prerender-webpack-plugin
 # install peer dependencies
-$ npm install --save-dev webpack extract-text-webpack-plugin html-webpack-plugin
+$ npm install --save-dev webpack html-webpack-plugin
 ```
 
 ## Usage
@@ -23,6 +23,7 @@ module.exports = {
       // generate index.html, about/index.html
       routes: ['/', '/about'],
 
+      // (optional)
       // string: path to base webpack config
       // function | object: webpack config
       config: './config/webpack.base.config.js',
@@ -41,13 +42,13 @@ module.exports = {
       // (optional): enable sourcemap
       sourcemap: true,
 
-      // (optional): whether write output into disk
+      // (optional): whether write output into disk for debugging
       // default: false
       // value:
       //    false   : disabled
-      //    true    : use default filename(`.render.js`)
+      //    true    : use default filename(`prerender.js`)
       //    <string>: use custom filename
-      // note: filename will be resolved with process.cwd()
+      // note: filename will be resolved with webpackConfig.output.path
       writeFile: false,
 
       // (optional): opts passed to webpack-node-externals
