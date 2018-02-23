@@ -1,4 +1,4 @@
-import { nodeExternals } from './peers'
+import nodeExternals from 'webpack-node-externals'
 
 export default ({ nodeExternalsOptions } = {}) => ({
   node: {

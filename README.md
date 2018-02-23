@@ -23,13 +23,13 @@ module.exports = {
       // generate index.html, about/index.html
       routes: ['/', '/about'],
 
+      // entry point, provide render function: (pathname) => content
+      entry: './src/ssr/render.js',
+
       // (optional)
       // string: path to base webpack config
       // function | object: webpack config
       config: './config/webpack.base.config.js',
-
-      // entry point, provide render function: (pathname) => content
-      entry: './src/ssr/render.js',
 
       // (optional): (content, pathname) => HtmlWebpackPluginOpts
       // The returned value will be merged into HtmlWebpackPluginOpts
@@ -39,17 +39,15 @@ module.exports = {
         template: './src/index.ejs',
       }),
 
-      // (optional): enable sourcemap
+      // (optional): whether enable sourcemap
       sourcemap: true,
 
-      // (optional): whether write output into disk for debugging
-      // default: false
-      // value:
-      //    false   : disabled
-      //    true    : use default filename(`prerender.js`)
-      //    <string>: use custom filename
-      // note: filename will be resolved with webpackConfig.output.path
-      writeFile: false,
+      // (optional): filename of output
+      // note: filename will be resolved with `outputPath` below
+      filename: 'prerender.js',
+
+      // (optional):
+      outputPath: '.prerender'
 
       // (optional): opts passed to webpack-node-externals
       // see also https://www.npmjs.com/package/webpack-node-externals

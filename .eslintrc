@@ -3,6 +3,7 @@
   "rules": {
     "no-underscore-dangle": "off",
     "global-require": "off",
-    "no-new": "off"
+    "no-new": "off",
+    "no-param-reassign": "warn"
   }
 }

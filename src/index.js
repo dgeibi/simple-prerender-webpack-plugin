@@ -1,16 +1,10 @@
-/* eslint-disable no-param-reassign */
 import { statSync } from 'fs'
-import { resolve } from 'path'
+import { resolve, normalize, relative } from 'path'
 
-import outputFile from './outputFile'
-import requireCWD from './requireCwd'
+import { HtmlWebpackPlugin } from './peers'
+import { interopRequire } from './require'
 import requireWithWebpack from './requireWithWebpack'
 import getFilename from './getFilename'
-
-const HtmlWebpackPlugin = requireCWD('html-webpack-plugin')
-
-const interopRequire = id =>
-  typeof id === 'string' && id ? requireCWD(id) : id
 
 const isFile = filepath => {
   try {
@@ -26,8 +20,9 @@ function SimplePrerenderWebpackPlugin({
   config,
   getHtmlWebpackPluginOpts,
   nodeExternalsOptions,
-  writeFile = false,
   sourcemap = true,
+  filename,
+  outputPath,
 } = {}) {
   const errorMsgs = []
   if (!Array.isArray(routes) || !routes[0]) {
@@ -59,13 +54,29 @@ function SimplePrerenderWebpackPlugin({
     throw Error(errorMsgs.map(x => x.trim()).join('\n'))
   }
 
+  outputPath = resolve(
+    typeof outputPath !== 'string' || !outputPath ? '.prerender' : outputPath
+  )
+
+  filename =
+    typeof filename !== 'string' || !filename
+      ? 'prerender.js'
+      : normalize(filename)
+
+  const fullFilename = resolve(outputPath, filename)
+  if (fullFilename === filename) {
+    filename = relative(outputPath, filename)
+  }
+
   this.opts = {
     routes,
     config,
     entry,
     nodeExternalsOptions,
-    writeFile,
     sourcemap,
+    outputPath,
+    filename,
+    fullFilename,
     getHtmlWebpackPluginOpts:
       typeof getHtmlWebpackPluginOpts === 'function'
         ? getHtmlWebpackPluginOpts
@@ -76,7 +87,6 @@ function SimplePrerenderWebpackPlugin({
 }
 
 SimplePrerenderWebpackPlugin.prototype.apply = function apply(compiler) {
-  this.opts.outputPath = compiler.options.output.path
   const resultPromise = requireWithWebpack(this.opts)
     .then(result => ({
       result,
@@ -88,16 +98,11 @@ SimplePrerenderWebpackPlugin.prototype.apply = function apply(compiler) {
 
   compiler.plugin('run', (compilation, callback) => {
     resultPromise
-      .then(
-        r =>
-          this.opts.writeFile && r.result
-            ? this.emitFile(r, compiler.outputFileSystem)
-            : r
-      )
       .then(({ result, error }) => {
         if (error) throw error
         const { getHtmlWebpackPluginOpts, routes } = this.opts
-        const render = result.object
+        const render = 'default' in result ? result.default : result
+
         if (typeof render !== 'function') {
           throw Error('entry should be function: (pathname) => any')
         }
@@ -121,18 +126,6 @@ SimplePrerenderWebpackPlugin.prototype.apply = function apply(compiler) {
         callback(error)
       })
   })
-}
-
-SimplePrerenderWebpackPlugin.prototype.emitFile = function emitFile(ref, fs) {
-  const { filename, fileRaw, mapRaw, mapFilename } = ref.result
-  return Promise.all([
-    outputFile(filename, fileRaw, fs),
-    mapRaw !== undefined && outputFile(mapFilename, mapRaw, fs),
-  ])
-    .then(() => ref)
-    .catch(error => ({
-      error: ref.error || error,
-    }))
 }
 
 export default SimplePrerenderWebpackPlugin

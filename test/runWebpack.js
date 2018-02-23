@@ -2,6 +2,7 @@ const webpack = require('webpack')
 const path = require('path')
 // eslint-disable-next-line
 const MemoryFS = require('memory-fs')
+const fse = require('fs-extra')
 
 const outputPath = `${__dirname}/output`
 
@@ -13,6 +14,9 @@ const config = {
 }
 
 module.exports = plugin => {
+  fse.removeSync(plugin.opts.fullFilename)
+  fse.removeSync(`${plugin.opts.fullFilename}.map`)
+
   const compiler = webpack(
     Object.assign(
       {

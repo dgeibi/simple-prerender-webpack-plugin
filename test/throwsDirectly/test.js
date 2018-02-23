@@ -9,6 +9,7 @@ const plugin = new SP({
     template: `${__dirname}/../resources/index.ejs`,
     content,
   }),
+  outputPath: __dirname,
 })
 
 tap.rejects(

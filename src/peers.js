@@ -1,7 +1,6 @@
-import requireCwd from './requireCwd'
+import { requireCwd } from './require'
 
-const nodeExternals = requireCwd('webpack-node-externals')
+const HtmlWebpackPlugin = requireCwd('html-webpack-plugin')
 const webpack = requireCwd('webpack')
-const MemoryFS = requireCwd('memory-fs')
 
-export { nodeExternals, webpack, MemoryFS }
+export { webpack, HtmlWebpackPlugin }

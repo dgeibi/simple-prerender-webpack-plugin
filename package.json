@@ -1,6 +1,6 @@
 {
   "name": "simple-prerender-webpack-plugin",
-  "version": "1.0.1",
+  "version": "2.0.0",
   "description": "prerender with webpack and html-webpack-plugin",
   "main": "index.js",
   "scripts": {
@@ -14,14 +14,13 @@
   "license": "MIT",
   "dependencies": {
     "resolve-cwd": "^2.0.0",
-    "source-map-support": "^0.5.3",
-    "universalify": "^0.1.1",
     "webpack-merge": "^4.1.1",
     "webpack-node-externals": "^1.6.0"
   },
   "devDependencies": {
     "eslint": "^4.18.1",
     "eslint-config-dgeibi": "^4.1.0",
+    "fs-extra": "^5.0.0",
     "html-webpack-plugin": "^2.30.1",
     "husky": "^0.14.3",
     "lint-staged": "^6.1.1",

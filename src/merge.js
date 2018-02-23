@@ -1,36 +1,34 @@
+/* eslint-disable consistent-return */
 import webpackMerge from 'webpack-merge'
 
-async function merge(opts) {
+function merge(opts) {
   const configs = []
 
-  async function push(x) {
+  function pushSync(x) {
     if (x && typeof x === 'object') {
-      if (x instanceof Promise) {
-        const px = await x
-        if (px && typeof px === 'object') {
-          configs.push(px)
-        }
-      } else {
-        configs.push(x)
-      }
+      configs.push(x)
     }
   }
 
-  async function pushConfig(x) {
+  function push(x) {
+    if (x && typeof x.then === 'function') {
+      return Promise.resolve(x).then(pushSync)
+    }
+    pushSync(x)
+  }
+
+  function pushConfig(x) {
     if (!x) return
     if (typeof x === 'function') {
-      await push(x())
-    } else {
-      await push(x)
+      return push(x())
     }
+    return push(x)
   }
 
-  /* eslint-disable no-restricted-syntax, no-await-in-loop */
-  for (const x of opts) {
-    await pushConfig(x)
-  }
-
-  return webpackMerge(configs)
+  return opts
+    .map(x => () => pushConfig(x))
+    .reduce((p, f) => p.then(f), Promise.resolve())
+    .then(() => webpackMerge(configs))
 }
 
 export default merge
