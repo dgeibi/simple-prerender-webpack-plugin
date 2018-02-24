@@ -4,7 +4,7 @@
   "description": "prerender with webpack and html-webpack-plugin",
   "main": "index.js",
   "scripts": {
-    "build": "microbundle --format=cjs --external=all --compress=false",
+    "build": "microbundle --format=cjs --external=all",
     "lint": "eslint .",
     "format": "prettier --write \"**/*.{js,md}\" \"**/.*rc\"",
     "precommit": "lint-staged",
@@ -13,7 +13,11 @@
   "author": "dgeibi",
   "license": "MIT",
   "dependencies": {
+    "mkdirp": "^0.5.1",
+    "promise.series": "^0.2.0",
     "resolve-cwd": "^2.0.0",
+    "source-map-support": "^0.5.3",
+    "universalify": "^0.1.1",
     "webpack-merge": "^4.1.1",
     "webpack-node-externals": "^1.6.0"
   },

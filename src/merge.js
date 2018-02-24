@@ -1,5 +1,6 @@
 /* eslint-disable consistent-return */
 import webpackMerge from 'webpack-merge'
+import pseries from 'promise.series'
 
 function merge(opts) {
   const configs = []
@@ -25,10 +26,9 @@ function merge(opts) {
     return push(x)
   }
 
-  return opts
-    .map(x => () => pushConfig(x))
-    .reduce((p, f) => p.then(f), Promise.resolve())
-    .then(() => webpackMerge(configs))
+  return pseries(opts.map(x => () => pushConfig(x))).then(() =>
+    webpackMerge(configs)
+  )
 }
 
 export default merge

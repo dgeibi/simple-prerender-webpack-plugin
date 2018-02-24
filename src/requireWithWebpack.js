@@ -1,7 +1,10 @@
-import { webpack } from './peers'
-import { requireFresh } from './require'
+import pseries from 'promise.series'
+import { webpack, MemoryFS } from './peers'
 import nodeTarget from './nodeTarget'
 import merge from './merge'
+import outputFile from './outputFile'
+import importFromMemory from './importFromMemory'
+import * as mapStore from './mapStore'
 
 function requireWithWebpack({
   entry,
@@ -11,6 +14,8 @@ function requireWithWebpack({
   outputPath,
   filename,
   fullFilename,
+  writeToDisk,
+  newContext,
 }) {
   return merge([
     nodeTarget({
@@ -30,23 +35,37 @@ function requireWithWebpack({
       devtool: 'sourcemap',
     },
   ]).then(webpackConfig => {
+    const fs = new MemoryFS()
     const compiler = webpack(webpackConfig)
-    return new Promise((resolve, reject) => {
-      compiler.run((err, stats) => {
-        if (err || stats.hasErrors()) {
-          reject(err || stats)
-          return
-        }
+    compiler.outputFileSystem = fs
+    return runCompiler(compiler).then(() => {
+      const fileRaw = fs.readFileSync(fullFilename, 'utf8')
+      const mapFilename = `${fullFilename}.map`
+      const mapRaw = sourcemap && fs.readFileSync(mapFilename, 'utf8')
+      if (sourcemap && mapRaw) {
+        mapStore.add(fullFilename, mapRaw)
+      }
+      return pseries([
+        writeToDisk &&
+          (() =>
+            Promise.all([
+              outputFile(fullFilename, fileRaw),
+              mapRaw && outputFile(mapFilename, mapRaw),
+            ])),
+        () => importFromMemory(fileRaw, fullFilename, newContext),
+      ])
+    })
+  })
+}
 
-        let object
-        try {
-          object = requireFresh(fullFilename)
-        } catch (e) {
-          reject(e)
-          return
-        }
-        resolve(object)
-      })
+function runCompiler(compiler) {
+  return new Promise((resolve, reject) => {
+    compiler.run((err, stats) => {
+      if (err || stats.hasErrors()) {
+        reject(err || stats)
+        return
+      }
+      resolve()
     })
   })
 }

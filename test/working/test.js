@@ -11,6 +11,7 @@ const plugin = new SP({
     template: `${__dirname}/../resources/index.ejs`,
     content,
   }),
+  writeToDisk: true,
 })
 
 runWebpack(plugin).then(({ html }) => {

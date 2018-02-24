@@ -4,6 +4,7 @@
     "no-underscore-dangle": "off",
     "global-require": "off",
     "no-new": "off",
-    "no-param-reassign": "warn"
+    "no-param-reassign": "warn",
+    "consistent-return": "warn"
   }
 }

@@ -5,6 +5,7 @@ import { HtmlWebpackPlugin } from './peers'
 import { interopRequire } from './require'
 import requireWithWebpack from './requireWithWebpack'
 import getFilename from './getFilename'
+import * as mapStore from './mapStore'
 
 const isFile = filepath => {
   try {
@@ -23,6 +24,8 @@ function SimplePrerenderWebpackPlugin({
   sourcemap = true,
   filename,
   outputPath,
+  writeToDisk = false,
+  newContext = false,
 } = {}) {
   const errorMsgs = []
   if (!Array.isArray(routes) || !routes[0]) {
@@ -77,6 +80,8 @@ function SimplePrerenderWebpackPlugin({
     outputPath,
     filename,
     fullFilename,
+    writeToDisk,
+    newContext,
     getHtmlWebpackPluginOpts:
       typeof getHtmlWebpackPluginOpts === 'function'
         ? getHtmlWebpackPluginOpts
@@ -120,6 +125,7 @@ SimplePrerenderWebpackPlugin.prototype.apply = function apply(compiler) {
             )
           ).apply(compiler)
         }
+        mapStore.remove(this.opts.fullFilename)
         callback()
       })
       .catch(error => {

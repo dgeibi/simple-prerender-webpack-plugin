@@ -20,18 +20,21 @@ const SimplePrerenderWebpackPlugin = require('simple-prerender-webpack-plugin')
 module.exports = {
   plugins: [
     new SimplePrerenderWebpackPlugin({
-      // generate index.html, about/index.html
+      // (required) routes to render
+      // generate index.html, about/index.html:
       routes: ['/', '/about'],
 
-      // entry point, provide render function: (pathname) => content
+      // (required) entry point:
+      // <string>: path to file which exports render function
+      // render function should be `(pathname) => content (anything you like)`
       entry: './src/ssr/render.js',
 
       // (optional)
-      // string: path to base webpack config
-      // function | object: webpack config
+      // <string>: path to base webpack config
+      // <function | object>: webpack config
       config: './config/webpack.base.config.js',
 
-      // (optional): (content, pathname) => HtmlWebpackPluginOpts
+      // (optional): <function> (content, pathname) => HtmlWebpackPluginOpts
       // The returned value will be merged into HtmlWebpackPluginOpts
       // see also https://www.npmjs.com/package/html-webpack-plugin
       getHtmlWebpackPluginOpts: (content, pathname) => ({
@@ -39,17 +42,26 @@ module.exports = {
         template: './src/index.ejs',
       }),
 
-      // (optional): whether enable sourcemap
+      // (optional): <boolean> whether enable sourcemap
       sourcemap: true,
 
-      // (optional): filename of output
-      // note: filename will be resolved with `outputPath` below
+      // (optional): <string> filename of output
+      // note: filename will be resolved with `outputPath` below,
+      //       should be unique between plugin instances
       filename: 'prerender.js',
 
-      // (optional):
-      outputPath: '.prerender'
+      // (optional): <boolean> whether write output to disk
+      writeToDisk: false,
 
-      // (optional): opts passed to webpack-node-externals
+      // (optional):
+      outputPath: '.prerender',
+
+      // (optional): <boolean> whether create a new global object other than sharing
+      //             context with plugins.
+      // note: when a plugin applying, all route renders share a global object.
+      newContext: false,
+
+      // (optional): <object> opts passed to webpack-node-externals
       // see also https://www.npmjs.com/package/webpack-node-externals
       nodeExternalsOptions: {},
     }),
