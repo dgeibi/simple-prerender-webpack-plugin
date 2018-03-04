@@ -42,11 +42,15 @@ module.exports = plugins => {
         )
         return
       }
-      resolve({
-        fs,
-        outputPath,
-        html: fs.readFileSync(path.join(outputPath, 'index.html'), 'utf8'),
-      })
+      try {
+        resolve({
+          fs,
+          outputPath,
+          html: fs.readFileSync(path.join(outputPath, 'index.html'), 'utf8'),
+        })
+      } catch (e) {
+        reject(e)
+      }
     })
   })
 }

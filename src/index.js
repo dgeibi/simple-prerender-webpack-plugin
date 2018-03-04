@@ -92,46 +92,31 @@ function SimplePrerenderWebpackPlugin({
 }
 
 SimplePrerenderWebpackPlugin.prototype.apply = function apply(compiler) {
-  const resultPromise = requireWithWebpack(this.opts)
-    .then(result => ({
-      result,
-      error: result.error,
-    }))
-    .catch(error => ({
-      error,
-    }))
+  compiler.hooks.run.tapPromise('simple-prerender-webpack-plugin', () =>
+    requireWithWebpack(this.opts).then(result => {
+      const { getHtmlWebpackPluginOpts, routes } = this.opts
+      const render = 'default' in result ? result.default : result
 
-  compiler.plugin('run', (compilation, callback) => {
-    resultPromise
-      .then(({ result, error }) => {
-        if (error) throw error
-        const { getHtmlWebpackPluginOpts, routes } = this.opts
-        const render = 'default' in result ? result.default : result
+      if (typeof render !== 'function') {
+        throw Error('entry should be function: (pathname) => any')
+      }
 
-        if (typeof render !== 'function') {
-          throw Error('entry should be function: (pathname) => any')
-        }
-
-        for (let i = 0; i < routes.length; i += 1) {
-          const pathname = routes[i]
-          const rendered = render(pathname)
-          const filename = getFilename(pathname)
-          new HtmlWebpackPlugin(
-            Object.assign(
-              {
-                filename,
-              },
-              getHtmlWebpackPluginOpts(rendered, pathname)
-            )
-          ).apply(compiler)
-        }
-        mapStore.remove(this.opts.fullFilename)
-        callback()
-      })
-      .catch(error => {
-        callback(error)
-      })
-  })
+      for (let i = 0; i < routes.length; i += 1) {
+        const pathname = routes[i]
+        const rendered = render(pathname)
+        const filename = getFilename(pathname)
+        new HtmlWebpackPlugin(
+          Object.assign(
+            {
+              filename,
+            },
+            getHtmlWebpackPluginOpts(rendered, pathname)
+          )
+        ).apply(compiler)
+      }
+      mapStore.remove(this.opts.fullFilename)
+    })
+  )
 }
 
 export default SimplePrerenderWebpackPlugin
