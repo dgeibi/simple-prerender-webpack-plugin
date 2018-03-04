@@ -5,9 +5,10 @@
 ## Install
 
 ```sh
-$ npm install --save-dev simple-prerender-webpack-plugin
-# install peer dependencies
-$ npm install --save-dev webpack html-webpack-plugin
+## for webpack 4
+$ npm install --save-dev webpack simple-prerender-webpack-plugin html-webpack-plugin
+## for webpack 3
+$ npm install --save-dev webpack@^3.0.0 simple-prerender-webpack-plugin@^2.0.0 html-webpack-plugin@^2.30.1
 ```
 
 ## Usage
