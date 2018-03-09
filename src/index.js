@@ -89,10 +89,40 @@ function SimplePrerenderWebpackPlugin({
             content,
           }),
   }
+  this.KEY = 'simple-prerender-webpack-plugin'
+}
+
+/**
+ * @param {object} maybeTapable
+ * @param {string} lifename
+ * @param {string} [legacyLifeName]
+ * @param {() => Promise} miss
+ */
+SimplePrerenderWebpackPlugin.prototype.tapPromise = function tapPromise(
+  maybeTapable,
+  lifename,
+  legacyLifeName,
+  miss
+) {
+  if (typeof legacyLifeName === 'function') {
+    miss = legacyLifeName
+    legacyLifeName = lifename
+  }
+  if (maybeTapable.hooks) {
+    maybeTapable.hooks[lifename].tapPromise(this.KEY, miss)
+  } else {
+    maybeTapable.plugin(legacyLifeName, (_, callback) => {
+      miss(_)
+        .then(() => {
+          callback()
+        })
+        .catch(callback)
+    })
+  }
 }
 
 SimplePrerenderWebpackPlugin.prototype.apply = function apply(compiler) {
-  compiler.hooks.run.tapPromise('simple-prerender-webpack-plugin', () =>
+  this.tapPromise(compiler, 'run', () =>
     requireWithWebpack(this.opts).then(result => {
       const { getHtmlWebpackPluginOpts, routes } = this.opts
       const render = 'default' in result ? result.default : result
