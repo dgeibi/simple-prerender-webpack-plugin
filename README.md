@@ -8,6 +8,11 @@
 $ npm install --save-dev webpack simple-prerender-webpack-plugin html-webpack-plugin
 ```
 
+## Examples
+
+* [dgeibi/yarb](https://github.com/dgeibi/yarb)
+* [dgeibi/the-little-cipher](https://github.com/dgeibi/the-little-cipher)
+
 ## Usage
 
 `webpack.config.js`:
