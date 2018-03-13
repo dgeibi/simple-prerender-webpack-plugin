@@ -26,6 +26,7 @@ function SimplePrerenderWebpackPlugin({
   outputPath,
   writeToDisk = false,
   newContext = false,
+  friends = [],
 } = {}) {
   const errorMsgs = []
   if (!Array.isArray(routes) || !routes[0]) {
@@ -82,6 +83,7 @@ function SimplePrerenderWebpackPlugin({
     fullFilename,
     writeToDisk,
     newContext,
+    friends,
     getHtmlWebpackPluginOpts:
       typeof getHtmlWebpackPluginOpts === 'function'
         ? getHtmlWebpackPluginOpts
@@ -130,7 +132,6 @@ SimplePrerenderWebpackPlugin.prototype.apply = function apply(compiler) {
       if (typeof render !== 'function') {
         throw Error('entry should be function: (pathname) => any')
       }
-
       for (let i = 0; i < routes.length; i += 1) {
         const pathname = routes[i]
         const rendered = render(pathname)
@@ -144,6 +145,9 @@ SimplePrerenderWebpackPlugin.prototype.apply = function apply(compiler) {
           )
         ).apply(compiler)
       }
+      this.opts.friends.forEach(plugin => {
+        plugin.apply(compiler)
+      })
       mapStore.remove(this.opts.fullFilename)
     })
   )

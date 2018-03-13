@@ -45,6 +45,9 @@ module.exports = {
         template: './src/index.ejs',
       }),
 
+      // (optional): <Array> webpack plugins that should be configured after HtmlWebpackPlugin
+      friends: [new (require('preload-webpack-plugin'))()],
+
       // (optional): <boolean> whether enable sourcemap
       sourcemap: true,
 
