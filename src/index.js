@@ -29,7 +29,7 @@ function SimplePrerenderWebpackPlugin({
   friends = [],
 } = {}) {
   const errorMsgs = []
-  if (!Array.isArray(routes) || !routes[0]) {
+  if (!Array.isArray(routes) || typeof routes[0] !== 'string') {
     errorMsgs.push('expect `routes` to be array of string')
   }
 
@@ -125,31 +125,34 @@ SimplePrerenderWebpackPlugin.prototype.tapPromise = function tapPromise(
 
 SimplePrerenderWebpackPlugin.prototype.apply = function apply(compiler) {
   this.tapPromise(compiler, 'run', () =>
-    requireWithWebpack(this.opts).then(result => {
-      const { getHtmlWebpackPluginOpts, routes } = this.opts
-      const render = 'default' in result ? result.default : result
-
-      if (typeof render !== 'function') {
-        throw Error('entry should be function: (pathname) => any')
-      }
-      for (let i = 0; i < routes.length; i += 1) {
-        const pathname = routes[i]
-        const rendered = render(pathname)
-        const filename = getFilename(pathname)
-        new HtmlWebpackPlugin(
-          Object.assign(
-            {
-              filename,
-            },
-            getHtmlWebpackPluginOpts(rendered, pathname)
-          )
-        ).apply(compiler)
-      }
-      this.opts.friends.forEach(plugin => {
-        plugin.apply(compiler)
+    requireWithWebpack(this.opts)
+      .then(result => {
+        const { getHtmlWebpackPluginOpts, routes } = this.opts
+        const render = 'default' in result ? result.default : result
+        if (typeof render !== 'function') {
+          throw Error('entry should be function: (pathname) => any')
+        }
+        return Promise.all(
+          routes.map(pathname => {
+            const filename = getFilename(pathname)
+            return Promise.resolve(render(pathname)).then(
+              content =>
+                new HtmlWebpackPlugin(
+                  Object.assign(
+                    {
+                      filename,
+                    },
+                    getHtmlWebpackPluginOpts(content, pathname)
+                  )
+                )
+            )
+          })
+        )
       })
-      mapStore.remove(this.opts.fullFilename)
-    })
+      .then(plugins => {
+        plugins.concat(this.opts.friends).forEach(x => x.apply(compiler))
+        mapStore.remove(this.opts.fullFilename)
+      })
   )
 }
 

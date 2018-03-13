@@ -29,7 +29,9 @@ module.exports = {
 
       // (required) entry point:
       // <string>: path to file which exports render function
-      // render function should be `(pathname) => content (anything you like)`
+      // render function should be `(pathname) => content (anything you like)`.
+      // If `content` is a promise, its resolve result would pass to the
+      // "getHtmlWebpackPluginOpts" function below.
       entry: './src/ssr/render.js',
 
       // (optional)
