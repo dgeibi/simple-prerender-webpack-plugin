@@ -1,7 +1,7 @@
 import { statSync } from 'fs'
 import { resolve, normalize, relative } from 'path'
 
-import { HtmlWebpackPlugin } from './peers'
+import HtmlWebpackPlugin from 'html-webpack-plugin'
 import { interopRequire } from './require'
 import requireWithWebpack from './requireWithWebpack'
 import getFilename from './getFilename'

@@ -1,5 +1,7 @@
 import pseries from 'promise.series'
-import { webpack, MemoryFS } from './peers'
+import webpack from 'webpack'
+import MemoryFS from 'memory-fs' // eslint-disable-line
+
 import nodeTarget from './nodeTarget'
 import merge from './merge'
 import outputFile from './outputFile'
