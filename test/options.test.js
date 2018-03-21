@@ -1,3 +1,5 @@
+/* eslint-disable no-new */
+
 const SP = require('..')
 const tap = require('tap')
 

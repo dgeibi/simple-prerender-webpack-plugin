@@ -1,7 +1,7 @@
 import path from 'path'
 import fs from 'fs'
-import { fromCallback as u } from 'universalify'
 import mkdirp from 'mkdirp'
+import pify from 'pify'
 
 function pathExists(filepath, callback) {
   fs.stat(filepath, (error, stats) => {
@@ -28,4 +28,4 @@ function outputFile(filename, data, callback) {
   })
 }
 
-export default u(outputFile)
+export default pify(outputFile)

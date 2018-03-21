@@ -12,9 +12,6 @@ const plugin = new SP({
   outputPath: __dirname,
 })
 
-tap.rejects(
-  runWebpack(plugin).catch(error => {
-    tap.match(error.stack, /(webpack:\/\/\/test\/throwsDirectly\/entry.js:1:1)/)
-    throw error
-  })
-)
+runWebpack(plugin).catch(error => {
+  tap.match(error.stack, /(test\/throwsDirectly\/entry.js:1:0)/)
+})

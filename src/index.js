@@ -5,7 +5,6 @@ import HtmlWebpackPlugin from 'html-webpack-plugin'
 import { interopRequire } from './require'
 import requireWithWebpack from './requireWithWebpack'
 import getFilename from './getFilename'
-import * as mapStore from './mapStore'
 
 const isFile = filepath => {
   try {
@@ -126,12 +125,11 @@ SimplePrerenderWebpackPlugin.prototype.tapPromise = function tapPromise(
 SimplePrerenderWebpackPlugin.prototype.apply = function apply(compiler) {
   this.tapPromise(compiler, 'run', () =>
     requireWithWebpack(this.opts)
-      .then(result => {
-        const { getHtmlWebpackPluginOpts, routes } = this.opts
-        const render = 'default' in result ? result.default : result
+      .then(render => {
         if (typeof render !== 'function') {
           throw Error('entry should be function: (pathname) => any')
         }
+        const { getHtmlWebpackPluginOpts, routes } = this.opts
         return Promise.all(
           routes.map(pathname => {
             const filename = getFilename(pathname)
@@ -151,7 +149,6 @@ SimplePrerenderWebpackPlugin.prototype.apply = function apply(compiler) {
       })
       .then(plugins => {
         plugins.concat(this.opts.friends).forEach(x => x.apply(compiler))
-        mapStore.remove(this.opts.fullFilename)
       })
   )
 }

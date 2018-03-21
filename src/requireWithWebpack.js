@@ -1,4 +1,3 @@
-import pseries from 'promise.series'
 import webpack from 'webpack'
 import MemoryFS from 'memory-fs' // eslint-disable-line
 
@@ -6,7 +5,12 @@ import nodeTarget from './nodeTarget'
 import merge from './merge'
 import outputFile from './outputFile'
 import importFromMemory from './importFromMemory'
-import * as mapStore from './mapStore'
+import runCompiler from './runCompiler'
+import {
+  createSourceMapConsumers,
+  rewriteErrorTrace,
+  withSourceMap,
+} from './source-map-support'
 
 function requireWithWebpack({
   entry,
@@ -44,30 +48,35 @@ function requireWithWebpack({
       const fileRaw = fs.readFileSync(fullFilename, 'utf8')
       const mapFilename = `${fullFilename}.map`
       const mapRaw = sourcemap && fs.readFileSync(mapFilename, 'utf8')
+      let maps
       if (sourcemap && mapRaw) {
-        mapStore.add(fullFilename, mapRaw)
+        maps = createSourceMapConsumers({
+          [fullFilename]: mapRaw,
+        })
+      } else {
+        maps = {}
       }
-      return pseries([
-        writeToDisk &&
-          (() =>
-            Promise.all([
-              outputFile(fullFilename, fileRaw),
-              mapRaw && outputFile(mapFilename, mapRaw),
-            ])),
-        () => importFromMemory(fileRaw, fullFilename, newContext),
-      ])
-    })
-  })
-}
 
-function runCompiler(compiler) {
-  return new Promise((resolve, reject) => {
-    compiler.run((err, stats) => {
-      if (err || stats.hasErrors()) {
-        reject(err || stats)
-        return
-      }
-      resolve()
+      return Promise.resolve(
+        writeToDisk &&
+          Promise.all([
+            outputFile(fullFilename, fileRaw),
+            mapRaw && outputFile(mapFilename, mapRaw),
+          ])
+      ).then(() => {
+        let result
+        try {
+          result = importFromMemory(fileRaw, fullFilename, newContext)
+        } catch (e) {
+          rewriteErrorTrace(e, maps)
+          throw e
+        }
+        let fn = 'default' in result ? result.default : result
+        if (typeof fn === 'function') {
+          fn = withSourceMap(fn, maps)
+        }
+        return fn
+      })
     })
   })
 }
