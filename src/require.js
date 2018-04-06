@@ -3,6 +3,7 @@ import resolveCwd from 'resolve-cwd'
 
 const requireCwd = id => require(resolveCwd(id))
 
-const interopRequire = id => (typeof id === 'string' && id ? require(id) : id)
+const interopRequire = id =>
+  typeof id === 'string' && id ? requireCwd(id) : id
 
 export { requireCwd, interopRequire }
