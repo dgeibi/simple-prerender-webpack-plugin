@@ -68,3 +68,6 @@ typings/
 
 /index.js
 /index.js.map
+
+/test/working/prerender.js
+/test/working/prerender.js.map
