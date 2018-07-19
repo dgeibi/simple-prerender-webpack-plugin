@@ -6,6 +6,8 @@
 
 由于 html-webpack-plugin 是动态加入的插件，所有依赖 html-webpack-plugin 的其它 webpack 插件需要放在 friends 数组中。
 
+**注：不支持 webpack 的 watch 模式**
+
 ## Install
 
 ```sh
