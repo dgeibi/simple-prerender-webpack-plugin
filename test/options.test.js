@@ -20,23 +20,10 @@ tap.throws(() => {
   })
 })
 
-tap.throws(() => {
-  new SP({
-    routes: ['/'],
-  })
-})
-
 tap.doesNotThrow(() => {
   new SP({
     routes: ['/'],
     entry: `${__dirname}/resources/entry.js`,
-  })
-})
-
-tap.throws(() => {
-  new SP({
-    routes: ['/'],
-    entry: `${__dirname}/resources/nothing.js`,
   })
 })
 

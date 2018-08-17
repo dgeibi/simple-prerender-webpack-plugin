@@ -71,3 +71,5 @@ typings/
 
 /test/working/prerender.js
 /test/working/prerender.js.map
+
+dist/

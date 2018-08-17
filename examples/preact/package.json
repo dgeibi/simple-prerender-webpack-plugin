@@ -1,0 +1,24 @@
+{
+  "name": "preact-example",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "webpack"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@babel/core": "^7.0.0-rc.1",
+    "@babel/preset-env": "^7.0.0-rc.1",
+    "@babel/runtime": "^7.0.0-rc.1",
+    "@dgeibi/babel-preset-react-app": "^1.2.0",
+    "babel-loader": "^8.0.0-beta.4",
+    "html-webpack-plugin": "^3.2.0",
+    "jsdom": "^11.12.0",
+    "preact": "^8.3.1",
+    "preact-render-to-string": "^3.8.2",
+    "webpack": "^4.16.5",
+    "webpack-cli": "^3.1.0"
+  }
+}

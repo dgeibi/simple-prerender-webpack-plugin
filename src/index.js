@@ -1,18 +1,9 @@
-import { statSync } from 'fs'
 import { resolve, normalize, relative } from 'path'
 
 import HtmlWebpackPlugin from 'html-webpack-plugin'
 import { interopRequire } from './require'
 import requireWithWebpack from './requireWithWebpack'
 import getFilename from './getFilename'
-
-const isFile = filepath => {
-  try {
-    return statSync(filepath).isFile()
-  } catch (e) {
-    return false
-  }
-}
 
 function SimplePrerenderWebpackPlugin({
   entry,
@@ -24,7 +15,7 @@ function SimplePrerenderWebpackPlugin({
   filename,
   outputPath,
   writeToDisk = false,
-  newContext = false,
+  newContext = true,
   friends = [],
 } = {}) {
   const errorMsgs = []
@@ -41,15 +32,6 @@ function SimplePrerenderWebpackPlugin({
     const type = typeof config
     if (!config || !(type === 'object' || type === 'function')) {
       errorMsgs.push('`config` should be a function or a object')
-    }
-  }
-
-  if (!entry) {
-    errorMsgs.push('`entry` should be a string')
-  } else {
-    entry = resolve(entry)
-    if (!isFile(entry)) {
-      errorMsgs.push(`${entry} should be file`)
     }
   }
 

@@ -33,7 +33,7 @@ module.exports = {
       // generate index.html, about/index.html:
       routes: ['/', '/about'],
 
-      // (required) entry point:
+      // (optional) entry point:
       // <string>: path to file which exports render function
       // render function should be `(pathname) => content (anything you like)`.
       // If `content` is a promise, its resolve result would pass to the
@@ -73,7 +73,7 @@ module.exports = {
       // (optional): <boolean> whether create a new global object other than sharing
       //             context with plugins.
       // note: when a plugin applying, all route renders share a global object.
-      newContext: false,
+      newContext: true,
 
       // (optional): <object> opts passed to webpack-node-externals
       // see also https://www.npmjs.com/package/webpack-node-externals
