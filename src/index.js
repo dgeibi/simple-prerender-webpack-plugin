@@ -74,6 +74,8 @@ function SimplePrerenderWebpackPlugin({
           }),
   }
   this.KEY = 'simple-prerender-webpack-plugin'
+  this._inited = false
+  this._htmlWebpackPlugins = new Map()
 }
 
 /**
@@ -106,8 +108,6 @@ SimplePrerenderWebpackPlugin.prototype.tapPromise = function tapPromise(
 }
 
 SimplePrerenderWebpackPlugin.prototype.apply = function apply(compiler) {
-  this._inited = this._inited || false
-  this._htmlWebpackPlugins = this._htmlWebpackPlugins || new Map()
   const { getHtmlWebpackPluginOpts, routes } = this.opts
 
   const run = () => {
@@ -115,6 +115,7 @@ SimplePrerenderWebpackPlugin.prototype.apply = function apply(compiler) {
       if (typeof render !== 'function') {
         throw Error('entry should be function: (pathname) => any')
       }
+
       if (!this._inited) {
         this._inited = true
         return Promise.all(
@@ -145,7 +146,6 @@ SimplePrerenderWebpackPlugin.prototype.apply = function apply(compiler) {
                 plugin.options,
                 omit(getHtmlWebpackPluginOpts(content, pathname), [
                   'template',
-                  'templateParameters',
                   'filename',
                   'hash',
                   'inject',
