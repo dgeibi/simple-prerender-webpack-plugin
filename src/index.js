@@ -1,5 +1,6 @@
 import { resolve, normalize, relative } from 'path'
 
+import omit from 'lodash/omit'
 import HtmlWebpackPlugin from 'html-webpack-plugin'
 import { interopRequire } from './require'
 import requireWithWebpack from './requireWithWebpack'
@@ -105,34 +106,70 @@ SimplePrerenderWebpackPlugin.prototype.tapPromise = function tapPromise(
 }
 
 SimplePrerenderWebpackPlugin.prototype.apply = function apply(compiler) {
-  this.tapPromise(compiler, 'run', () =>
-    requireWithWebpack(this.opts)
-      .then(render => {
-        if (typeof render !== 'function') {
-          throw Error('entry should be function: (pathname) => any')
-        }
-        const { getHtmlWebpackPluginOpts, routes } = this.opts
+  this._inited = this._inited || false
+  this._htmlWebpackPlugins = this._htmlWebpackPlugins || new Map()
+  const { getHtmlWebpackPluginOpts, routes } = this.opts
+
+  const run = () => {
+    return requireWithWebpack(this.opts).then(render => {
+      if (typeof render !== 'function') {
+        throw Error('entry should be function: (pathname) => any')
+      }
+      if (!this._inited) {
+        this._inited = true
         return Promise.all(
           routes.map(pathname => {
             const filename = getFilename(pathname)
-            return Promise.resolve(render(pathname)).then(
-              content =>
-                new HtmlWebpackPlugin(
-                  Object.assign(
-                    {
-                      filename,
-                    },
-                    getHtmlWebpackPluginOpts(content, pathname)
-                  )
+            return Promise.resolve(render(pathname)).then(content => {
+              const plugin = new HtmlWebpackPlugin(
+                Object.assign(
+                  {
+                    filename,
+                  },
+                  getHtmlWebpackPluginOpts(content, pathname)
                 )
-            )
+              )
+              this._htmlWebpackPlugins.set(pathname, plugin)
+              return plugin
+            })
+          })
+        ).then(plugins => {
+          plugins.concat(this.opts.friends).forEach(x => x.apply(compiler))
+        })
+      } else {
+        return Promise.all(
+          routes.map(pathname => {
+            return Promise.resolve(render(pathname)).then(content => {
+              const plugin = this._htmlWebpackPlugins.get(pathname)
+              Object.assign(
+                plugin.options,
+                omit(getHtmlWebpackPluginOpts(content, pathname), [
+                  'template',
+                  'templateParameters',
+                  'filename',
+                  'hash',
+                  'inject',
+                  'compile',
+                  'favicon',
+                  'minify',
+                  'cache',
+                  'showErrors',
+                  'chunks',
+                  'excludeChunks',
+                  'chunksSortMode',
+                  'meta',
+                  'title',
+                  'xhtml',
+                ])
+              )
+            })
           })
         )
-      })
-      .then(plugins => {
-        plugins.concat(this.opts.friends).forEach(x => x.apply(compiler))
-      })
-  )
+      }
+    })
+  }
+  this.tapPromise(compiler, 'run', run)
+  this.tapPromise(compiler, 'watchRun', 'watch-run', run)
 }
 
 export default SimplePrerenderWebpackPlugin
