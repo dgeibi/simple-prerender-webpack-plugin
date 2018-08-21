@@ -1,7 +1,7 @@
-const SP = require('../..')
-const runWebpack = require('../runWebpack')
 const tap = require('tap')
 const fs = require('fs')
+const SP = require('../..')
+const runWebpack = require('../runWebpack')
 
 const plugin = new SP({
   routes: ['/'],

@@ -12,17 +12,20 @@ import {
   withSourceMap,
 } from './source-map-support'
 
-function requireWithWebpack({
-  entry,
-  config,
-  nodeExternalsOptions,
-  sourcemap,
-  outputPath,
-  filename,
-  fullFilename,
-  writeToDisk,
-  newContext,
-}) {
+function requireWithWebpack(
+  {
+    entry,
+    config,
+    nodeExternalsOptions,
+    sourcemap,
+    outputPath,
+    filename,
+    fullFilename,
+    writeToDisk,
+    newContext,
+  },
+  handleWebpackConfig
+) {
   return merge([
     nodeTarget({
       nodeExternalsOptions,
@@ -41,6 +44,7 @@ function requireWithWebpack({
       devtool: 'sourcemap',
     },
   ]).then(webpackConfig => {
+    handleWebpackConfig(webpackConfig)
     const fs = new MemoryFS()
     const compiler = webpack(webpackConfig)
     compiler.outputFileSystem = fs

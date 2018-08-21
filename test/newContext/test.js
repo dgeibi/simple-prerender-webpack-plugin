@@ -1,6 +1,6 @@
+const tap = require('tap')
 const SP = require('../..')
 const runWebpack = require('../runWebpack')
-const tap = require('tap')
 
 const base = {
   getHtmlWebpackPluginOpts: content => ({

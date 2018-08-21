@@ -7,7 +7,7 @@ function App() {
 // eslint-disable-next-line
 let exports
 
-if (process.env.isSSR) {
+if (process.env.PRERENDER) {
   exports = url => {
     const { JSDOM } = require('jsdom')
     const dom = new JSDOM(``, {

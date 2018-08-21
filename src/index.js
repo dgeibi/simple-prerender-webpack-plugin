@@ -1,4 +1,5 @@
 import { resolve, normalize, relative } from 'path'
+import webpack from 'webpack'
 
 import omit from 'lodash/omit'
 import HtmlWebpackPlugin from 'html-webpack-plugin'
@@ -109,9 +110,25 @@ SimplePrerenderWebpackPlugin.prototype.tapPromise = function tapPromise(
 
 SimplePrerenderWebpackPlugin.prototype.apply = function apply(compiler) {
   const { getHtmlWebpackPluginOpts, routes } = this.opts
+  new webpack.DefinePlugin({
+    'process.env.PRERENDER': 'false',
+  }).apply(compiler)
 
   const run = () => {
-    return requireWithWebpack(this.opts).then(render => {
+    return requireWithWebpack(this.opts, config => {
+      const plugins =
+        (config.plugins &&
+          config.plugins.filter(
+            x => !(x instanceof SimplePrerenderWebpackPlugin)
+          )) ||
+        []
+      plugins.push(
+        new webpack.DefinePlugin({
+          'process.env.PRERENDER': 'true',
+        })
+      )
+      config.plugins = plugins
+    }).then(render => {
       if (typeof render !== 'function') {
         throw Error('entry should be function: (pathname) => any')
       }
