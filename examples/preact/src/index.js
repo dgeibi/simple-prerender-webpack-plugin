@@ -1,7 +1,11 @@
 import { h, render } from 'preact'
 
 function App() {
-  return <div>OH! {window.location.href}</div>
+  return (
+    <div>
+      OH! {window.location.href} {process.env.NODE_ENV}
+    </div>
+  )
 }
 
 // eslint-disable-next-line
