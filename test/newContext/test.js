@@ -3,9 +3,8 @@ const SP = require('../..')
 const runWebpack = require('../runWebpack')
 
 const base = {
-  getHtmlWebpackPluginOpts: content => ({
+  customizeHtmlWebpackPluginOpts: () => ({
     template: `${__dirname}/../resources/index.ejs`,
-    content,
   }),
   outputPath: __dirname,
   newContext: true,

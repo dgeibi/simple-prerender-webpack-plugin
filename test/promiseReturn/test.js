@@ -6,9 +6,8 @@ const plugin = new SP({
   routes: ['/'],
   entry: `${__dirname}/entry.js`,
   outputPath: __dirname,
-  getHtmlWebpackPluginOpts: content => ({
+  customizeHtmlWebpackPluginOpts: () => ({
     template: `${__dirname}/../resources/index.ejs`,
-    content,
   }),
 })
 

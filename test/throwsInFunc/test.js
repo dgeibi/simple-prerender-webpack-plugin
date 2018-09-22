@@ -5,9 +5,8 @@ const runWebpack = require('../runWebpack')
 const plugin = new SP({
   routes: ['/'],
   entry: `${__dirname}/entry.js`,
-  getHtmlWebpackPluginOpts: content => ({
+  customizeHtmlWebpackPluginOpts: () => ({
     template: `${__dirname}/../resources/index.ejs`,
-    content,
   }),
   outputPath: __dirname,
 })

@@ -13,11 +13,10 @@ const getConfig = ({ IS_PRERENDER = false } = {}) => ({
       new PrerenderPlugin({
         routes: ['/index.html', '/xxx/about.html'],
         config: getConfig({ IS_PRERENDER: true }),
-        getHtmlWebpackPluginOpts: content => ({
+        customizeHtmlWebpackPluginOpts: {
           template: './src/index.ejs',
           title: 'Preact Prerender Demo',
-          content,
-        }),
+        },
       }),
   ].filter(Boolean),
   module: {

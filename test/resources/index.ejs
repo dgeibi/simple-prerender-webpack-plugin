@@ -7,8 +7,8 @@
   <title>Document</title>
 </head>
 <body>
-  <div id="root"><% if (htmlWebpackPlugin.options.content) { %><%=
-    htmlWebpackPlugin.options.content
+  <div id="root"><% if (htmlWebpackPlugin.options.prerendered) { %><%=
+    htmlWebpackPlugin.options.prerendered
   %><% } %></div>
 </body>
 </html>
