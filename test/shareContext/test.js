@@ -6,7 +6,6 @@ const base = {
   customizeHtmlWebpackPluginOpts: () => ({
     template: `${__dirname}/../resources/index.ejs`,
   }),
-  outputPath: __dirname,
 }
 runWebpack([
   new SP(

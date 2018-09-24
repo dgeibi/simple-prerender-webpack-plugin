@@ -8,7 +8,6 @@ const plugin = new SP({
   customizeHtmlWebpackPluginOpts: () => ({
     template: `${__dirname}/../resources/index.ejs`,
   }),
-  outputPath: __dirname,
 })
 
 runWebpack(plugin).catch(error => {

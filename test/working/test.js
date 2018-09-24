@@ -1,20 +1,24 @@
 const tap = require('tap')
-const fs = require('fs')
+const fs = require('fs-extra')
 const SP = require('../..')
 const runWebpack = require('../runWebpack')
+
+const filename = `${__dirname}/prerender.js`
 
 const plugin = new SP({
   routes: ['/'],
   entry: `${__dirname}/entry.js`,
-  outputPath: __dirname,
   customizeHtmlWebpackPluginOpts: {
     template: `${__dirname}/../resources/index.ejs`,
   },
   writeToDisk: true,
+  filename,
 })
 
-runWebpack(plugin).then(({ html }) => {
-  tap.matchSnapshot(html)
-  tap.ok(fs.existsSync(plugin.opts.fullFilename))
-  tap.ok(fs.existsSync(`${plugin.opts.fullFilename}.map`))
-})
+Promise.all([fs.remove(filename), fs.remove(`${filename}.map`)]).then(() =>
+  runWebpack(plugin).then(({ html }) => {
+    tap.matchSnapshot(html)
+    tap.ok(fs.existsSync(filename))
+    tap.ok(fs.existsSync(`${filename}.map`))
+  })
+)

@@ -51,9 +51,6 @@ module.exports = {
       // (optional): <Array> webpack plugins that should be configured after HtmlWebpackPlugin
       friends: [new (require('preload-webpack-plugin'))()],
 
-      // (optional): <boolean> whether enable sourcemap
-      sourcemap: true,
-
       // (optional): <string> filename of output
       // note: filename will be resolved with `outputPath` below,
       //       should be unique between plugin instances
@@ -61,9 +58,6 @@ module.exports = {
 
       // (optional): <boolean> whether write output to disk
       writeToDisk: false,
-
-      // (optional):
-      outputPath: '.prerender',
 
       // (optional): <boolean> whether create a new global object other than sharing
       //             context with plugins.

@@ -2,25 +2,16 @@ const webpack = require('webpack')
 const path = require('path')
 // eslint-disable-next-line
 const MemoryFS = require('memory-fs')
-const fse = require('fs-extra')
 
-const outputPath = `${__dirname}/output`
-
-const config = {
-  entry: `${__dirname}/resources/entry.js`,
-  output: {
-    path: outputPath,
-  },
-}
-
-module.exports = plugins => {
+module.exports = (plugins, outputPath = `${__dirname}/output`) => {
+  const config = {
+    devtool: 'source-map',
+    entry: `${__dirname}/resources/entry.js`,
+    output: {
+      path: outputPath,
+    },
+  }
   if (!Array.isArray(plugins)) plugins = [plugins]
-  plugins.forEach(plugin => {
-    if (!plugin.opts || plugin.opts.fullFilename) return
-    fse.removeSync(plugin.opts.fullFilename)
-    fse.removeSync(`${plugin.opts.fullFilename}.map`)
-  })
-
   const compiler = webpack(
     Object.assign(
       {
