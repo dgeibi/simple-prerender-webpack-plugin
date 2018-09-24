@@ -1,29 +1,5 @@
 import { h, render } from 'preact'
+import App from './App'
 
-function App() {
-  return (
-    <div>
-      OH! {window.location.href} {process.env.NODE_ENV}
-    </div>
-  )
-}
-
-// eslint-disable-next-line
-let exports
-
-if (process.env.PRERENDER) {
-  exports = url => {
-    const { JSDOM } = require('jsdom')
-    const dom = new JSDOM(``, {
-      url: `https://example.org${url}`,
-    })
-    global.window = dom.window
-    const renderToString = require('preact-render-to-string').render
-    return renderToString(<App />)
-  }
-} else {
-  const app = document.querySelector('#root')
-  render(<App />, app, app.lastChild)
-}
-
-export default exports
+const app = document.querySelector('#root')
+render(<App />, app, app.lastChild)
