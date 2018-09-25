@@ -9,8 +9,6 @@
 * Sourcemap: to enable sourcemap just configure webpack with `devtool: source-map`
 * Inject rendering result into html-webpack-plugin as `htmlWebpackPlugin.options.prerendered`
 
-由于 html-webpack-plugin 是动态加入的插件，所有依赖 html-webpack-plugin 的其它 webpack 插件需要放在 friends 数组中。
-
 ## Install
 
 ```sh
