@@ -2,7 +2,12 @@
 
 [![version][version-badge]][package]
 
-这个插件帮你多开一个 webpack 实例构建 node 环境下的 js，并用 vm 模块执行，将执行之后导出的结果放入 html-webpack-plugin 的 options 中，使模板能够获取到对应的变量，由用户自己决定怎么使用该变量。
+## Features
+
+* Based on Promise
+* Support dynamic import
+* Sourcemap: to enable sourcemap just configure webpack with `devtool: source-map`
+* Inject rendering result into html-webpack-plugin as `htmlWebpackPlugin.options.prerendered`
 
 由于 html-webpack-plugin 是动态加入的插件，所有依赖 html-webpack-plugin 的其它 webpack 插件需要放在 friends 数组中。
 
