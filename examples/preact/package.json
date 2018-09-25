@@ -11,15 +11,17 @@
   "license": "ISC",
   "dependencies": {
     "@babel/core": "^7.0.0",
+    "@babel/polyfill": "^7.0.0",
     "@babel/preset-env": "^7.0.0",
     "@babel/runtime": "^7.0.0",
-    "@dgeibi/babel-preset-react-app": "^1.2.0",
+    "@dgeibi/babel-preset-react-app": "^1.2.1",
     "babel-loader": "^8.0.0",
+    "core-js": "^2.5.7",
     "html-webpack-plugin": "^3.2.0",
     "jsdom": "^11.12.0",
     "preact": "^8.3.1",
     "preact-render-to-string": "^3.8.2",
-    "webpack": "^4.19.0",
+    "webpack": "^4.20.0",
     "webpack-cli": "^3.1.0"
   }
 }

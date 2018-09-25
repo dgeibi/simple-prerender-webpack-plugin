@@ -11,5 +11,5 @@ const plugin = new SP({
 })
 
 runWebpack(plugin).catch(error => {
-  tap.match(error.stack, /(test\/throwsDirectly\/entry.js:1:0)/)
+  tap.match(error.stack, /(test[\\/]throwsDirectly[\\/]entry.js:1:0)/)
 })

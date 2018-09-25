@@ -59,10 +59,8 @@ module.exports = {
       // (optional): <boolean> whether write output to disk
       writeToDisk: false,
 
-      // (optional): <boolean> whether create a new global object other than sharing
-      //             context with plugins.
-      // note: when a plugin applying, all route renders share a global object.
-      newContext: true,
+      // when debug is `true`, plugin will not throw errors when evaluating.
+      debug: false,
 
       // (optional): <object> opts passed to webpack-node-externals
       // see also https://www.npmjs.com/package/webpack-node-externals

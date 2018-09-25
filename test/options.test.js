@@ -13,13 +13,6 @@ tap.throws(() => {
   })
 })
 
-tap.throws(() => {
-  new SP({
-    routes: ['/'],
-    config: null,
-  })
-})
-
 tap.doesNotThrow(() => {
   new SP({
     routes: ['/'],

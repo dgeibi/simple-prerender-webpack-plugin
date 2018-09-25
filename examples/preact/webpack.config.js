@@ -2,7 +2,7 @@ const path = require('path')
 const PrerenderPlugin = require('../..')
 
 const getConfig = ({ IS_PRERENDER = false } = {}) => ({
-  // devtool: 'source-map',
+  devtool: 'source-map',
   output: {
     chunkFilename: '[id].[contenthash:8].js',
     filename: '[name].[contenthash:8].js',
@@ -13,11 +13,12 @@ const getConfig = ({ IS_PRERENDER = false } = {}) => ({
       new PrerenderPlugin({
         entry: './src/ssr.js',
         routes: ['/index.html', '/xxx/about.html'],
-        config: {},
         customizeHtmlWebpackPluginOpts: {
           template: './src/index.ejs',
           title: 'Preact Prerender Demo',
         },
+        debug: true,
+        writeToDisk: true,
       }),
   ].filter(Boolean),
   module: {
