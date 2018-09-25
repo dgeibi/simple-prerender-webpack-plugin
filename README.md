@@ -41,9 +41,14 @@ module.exports = {
       entry: './src/ssr/render.js',
 
       // (optional)
-      // <string>: path to base webpack config
-      // <function | object>: webpack config
-      config: './config/webpack.base.config.js',
+      // <string>: path to partial webpack config
+      // <object>: partial webpack config
+      config: {
+        plugins: [],
+        node: {},
+        externals: [],
+        entry: './src/ssr/render.js',
+      },
 
       // (optional):
       // <object> HtmlWebpackPluginOpts
