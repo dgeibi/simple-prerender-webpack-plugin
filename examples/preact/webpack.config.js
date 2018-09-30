@@ -1,4 +1,5 @@
 const path = require('path')
+const HtmlWebpackPlugin = require('html-webpack-plugin')
 const PrerenderPlugin = require('../..')
 
 const getConfig = ({ IS_PRERENDER = false } = {}) => ({
@@ -9,17 +10,19 @@ const getConfig = ({ IS_PRERENDER = false } = {}) => ({
   },
   entry: path.join(__dirname, 'src/index.js'),
   plugins: [
-    !IS_PRERENDER &&
-      new PrerenderPlugin({
-        entry: './src/ssr.js',
-        routes: ['/index.html', '/xxx/about.html'],
-        customizeHtmlWebpackPluginOpts: {
+    ...['/index.html', '/xxx/about.html'].map(
+      filename =>
+        new HtmlWebpackPlugin({
+          filename,
           template: './src/index.ejs',
           title: 'Preact Prerender Demo',
-        },
-        debug: true,
-        writeToDisk: true,
-      }),
+        })
+    ),
+    new PrerenderPlugin({
+      entry: './src/ssr.js',
+      debug: true,
+      writeToDisk: true,
+    }),
   ].filter(Boolean),
   module: {
     rules: [

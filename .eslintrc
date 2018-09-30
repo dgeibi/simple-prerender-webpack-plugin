@@ -4,6 +4,7 @@
     "consistent-return": "warn",
     "arrow-body-style": "off",
     "no-param-reassign": "off",
-    "strict": "off"
+    "strict": "off",
+    "no-restricted-syntax": "off"
   }
 }
