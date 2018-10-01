@@ -1,6 +1,6 @@
 import React from 'react'
 import { hydrate } from 'react-dom'
-import Loadable from '@7rulnik/react-loadable'
+import Loadable from 'react-loadable'
 import App from './App'
 
 Loadable.preloadReady().then(() => {

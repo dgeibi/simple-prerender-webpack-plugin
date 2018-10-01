@@ -21,20 +21,16 @@ const getAssets = (manifest, moduleIds) => {
   }
 }
 
-function buildManifest(compilation) {
+function buildManifest(compilation, publicPath) {
   const manifest = {}
-
+  const _publicPath = publicPath || compilation.outputOptions.publicPath || ''
   for (const chunkGroup of compilation.chunkGroups) {
     const files = []
     for (const chunk of chunkGroup.chunks) {
       for (const file of chunk.files) {
-        const publicPath = url.resolve(
-          compilation.outputOptions.publicPath || '',
-          file
-        )
         files.push({
           file,
-          publicPath,
+          publicPath: url.resolve(_publicPath, file),
         })
       }
     }
@@ -47,7 +43,7 @@ function buildManifest(compilation) {
   return manifest
 }
 
-const getDynamicAssets = (compilation, moduleIds) =>
-  getAssets(buildManifest(compilation), moduleIds)
+const getDynamicAssets = (compilation, moduleIds, publicPath) =>
+  getAssets(buildManifest(compilation, publicPath), moduleIds)
 
 module.exports = getDynamicAssets

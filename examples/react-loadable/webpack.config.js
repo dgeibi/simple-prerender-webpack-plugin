@@ -48,7 +48,7 @@ module.exports = (env, args) => {
                     },
                   ],
                 ],
-                plugins: ['@7rulnik/react-loadable/babel'],
+                plugins: ['react-loadable/babel'],
               },
             },
             {

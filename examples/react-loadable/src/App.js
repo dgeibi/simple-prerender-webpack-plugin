@@ -1,5 +1,5 @@
 import React from 'react'
-import Loadable from '@7rulnik/react-loadable'
+import Loadable from 'react-loadable'
 import { Router } from '@reach/router'
 
 const Home = Loadable({
