@@ -18,8 +18,8 @@ $ npm install simple-prerender-webpack-plugin
 
 ## Examples
 
+* [examples](examples)
 * [dgeibi/yarb](https://github.com/dgeibi/yarb)
-* [dgeibi/the-little-cipher](https://github.com/dgeibi/the-little-cipher)
 
 ## Usage
 
@@ -27,18 +27,25 @@ $ npm install simple-prerender-webpack-plugin
 
 ```js
 const SimplePrerenderWebpackPlugin = require('simple-prerender-webpack-plugin')
+const HtmlWebpackPlugin = require('html-webpack-plugin')
 
 module.exports = {
-  plugins: [
-    new SimplePrerenderWebpackPlugin({
-      // (required) routes to render
-      // generate index.html, about/index.html:
-      routes: ['/', '/about'],
+  entry: './src/index.js',
 
-      // (optional) entry point:
-      // <string>: path to file which exports render function
-      // render function should be `(pathname) => content (anything you like)`. the content will be assigned to `htmlWebpackPlugin.prerendered`
-      entry: './src/ssr/render.js',
+  plugins: [
+    new HtmlWebpackPlugin({
+      filename: 'page1.html',
+      template: './src/template.ejs',
+    }),
+    new HtmlWebpackPlugin({
+      filename: 'page2.html',
+      template: './src/template.ejs',
+    }),
+    new SimplePrerenderWebpackPlugin({
+      // (optional) path to file which exports a prerender function
+      // <string|string[]>
+      // defaults to './src/index.js'
+      entry: './src/ssr.js',
 
       // (optional)
       // <string>: path to partial webpack config
@@ -47,22 +54,17 @@ module.exports = {
         plugins: [],
         node: {},
         externals: [],
-        entry: './src/ssr/render.js',
+        entry: './src/ssr.js',
       },
 
-      // (optional):
-      // <object> HtmlWebpackPluginOpts
-      // <function> ({ pathname, filename }) => HtmlWebpackPluginOpts
-      // see also https://www.npmjs.com/package/html-webpack-plugin
-      customizeHtmlWebpackPluginOpts: {},
-
-      // (optional): <Array> webpack plugins that should be configured after HtmlWebpackPlugin
-      friends: [new (require('preload-webpack-plugin'))()],
-
       // (optional): <string> filename of output
-      // note: filename will be resolved with `outputPath` below,
-      //       should be unique between plugin instances
       filename: 'prerender.js',
+
+      // (optional): <string>
+      chunkFilename: 'prerender.[id].js',
+
+      // (optional): <any>, see `examples/multi-instance`
+      id: '',
 
       // (optional): <boolean> whether write output to disk
       writeToDisk: false,
@@ -75,6 +77,35 @@ module.exports = {
       nodeExternalsOptions: {},
     }),
   ],
+}
+```
+
+`./src/template.ejs`:
+
+```ejs
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+  <title><%= htmlWebpackPlugin.options.title %></title>
+</head>
+<body><div id="root"><%= htmlWebpackPlugin.options.prerendered %></div>
+</body>
+</html>
+```
+
+`./src/ssr.js`:
+
+```js
+export default ({
+  outputName, // html filename
+  plugin, // html-webpack-plugin instance
+  assets, // html-webpack-plugin assets
+  compilation,
+  compiler,
+}) => {
+  return `<div>${outputName}</div>`
 }
 ```
 

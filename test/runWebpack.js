@@ -24,9 +24,18 @@ module.exports = (plugins, outputPath = `${__dirname}/output`) => {
   compiler.outputFileSystem = fs
   return new Promise((resolve, reject) => {
     compiler.run((err, stats) => {
-      if (err || stats.hasErrors()) {
+      if (err) {
         reject(
-          Object.assign(err || stats, {
+          Object.assign(err, {
+            fs,
+            outputPath,
+          })
+        )
+        return
+      }
+      if (stats.hasErrors()) {
+        reject(
+          Object.assign(Array.from(stats.toJson().errors), {
             fs,
             outputPath,
           })
