@@ -3,7 +3,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 const PrerenderPlugin = require('../..')
 
 module.exports = (env, args) => {
-  const hash = args.mode === 'development' ? '.[hash:8]' : '.[contenthash:8]'
+  const hash = args.mode === 'development' ? '' : '.[contenthash:8]'
   return {
     devtool: 'source-map',
     output: {
@@ -26,6 +26,9 @@ module.exports = (env, args) => {
         entry: './src/ssr.js',
       }),
     ],
+    devServer: {
+      contentBase: path.join(__dirname, 'dist'),
+    },
     module: {
       rules: [
         {
