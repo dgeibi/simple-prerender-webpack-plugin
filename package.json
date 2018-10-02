@@ -32,8 +32,8 @@
     "lib/"
   ],
   "peerDependencies": {
-    "webpack": "^4.0.0",
-    "html-webpack-plugin": "^3.0.0 || ^4.0.0"
+    "html-webpack-plugin": "^3.0.0 || ^4.0.0-beta.1",
+    "webpack": "^4.0.0"
   },
   "lint-staged": {
     "*.js": [

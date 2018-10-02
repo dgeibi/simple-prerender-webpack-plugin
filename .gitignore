@@ -73,3 +73,5 @@ typings/
 /test/working/prerender.js.map
 
 dist/
+
+/examples/*/package-lock.json

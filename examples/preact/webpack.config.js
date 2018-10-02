@@ -1,6 +1,6 @@
 const path = require('path')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
-const PrerenderPlugin = require('../..')
+const PrerenderPlugin = require('simple-prerender-webpack-plugin')
 
 const getConfig = ({ IS_PRERENDER = false } = {}) => ({
   devtool: 'source-map',
@@ -10,7 +10,7 @@ const getConfig = ({ IS_PRERENDER = false } = {}) => ({
   },
   entry: path.join(__dirname, 'src/index.js'),
   plugins: [
-    ...['/index.html', '/xxx/about.html'].map(
+    ...['index.html', 'xxx/about.html'].map(
       filename =>
         new HtmlWebpackPlugin({
           filename,
