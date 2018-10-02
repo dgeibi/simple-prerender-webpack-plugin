@@ -1,0 +1,21 @@
+{
+  "name": "multi-instance-example",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "private": true,
+  "scripts": {
+    "build": "webpack",
+    "dev": "webpack --watch"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "css-loader": "^1.0.0",
+    "html-webpack-plugin": "file:../../node_modules/html-webpack-plugin",
+    "mini-css-extract-plugin": "^0.4.3",
+    "simple-prerender-webpack-plugin": "file:../..",
+    "webpack": "^4.20.0",
+    "webpack-cli": "^3.1.2"
+  }
+}

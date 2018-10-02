@@ -4,10 +4,10 @@
 
 ## Features
 
-* Based on Promise
-* Support dynamic import
-* Sourcemap: to enable sourcemap just configure webpack with `devtool: source-map`
-* Inject rendering result into html-webpack-plugin as `htmlWebpackPlugin.options.prerendered`
+- Based on Promise
+- Support dynamic import
+- Sourcemap: to enable sourcemap just configure webpack with `devtool: source-map`
+- Inject rendering result into html-webpack-plugin as `htmlWebpackPlugin.options.prerendered`
 
 ## Install
 
@@ -18,8 +18,8 @@ $ npm install simple-prerender-webpack-plugin
 
 ## Examples
 
-* [examples](examples)
-* [dgeibi/yarb](https://github.com/dgeibi/yarb)
+- [examples](examples)
+- [dgeibi/yarb](https://github.com/dgeibi/yarb)
 
 ## Usage
 
@@ -55,6 +55,7 @@ module.exports = {
         node: {},
         externals: [],
         entry: './src/ssr.js',
+        module: {},
       },
 
       // (optional): <string> filename of output
