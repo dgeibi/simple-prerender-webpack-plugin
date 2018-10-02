@@ -6,16 +6,5 @@
  */
 'use strict'
 exports[`test\\promiseReturn\\test.js TAP > undefined 1`] = `
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>Document</title>
-</head>
-<body>
-  <div id="root">promise return</div>
-<script type="text/javascript" src="main.js"></script></body>
-</html>
+<!doctype html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="X-UA-Compatible" content="ie=edge"><title>Document</title></head><body><div id="root">promise return</div><script src="main.js"></script></body></html>
 `
