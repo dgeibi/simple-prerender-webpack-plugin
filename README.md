@@ -52,7 +52,6 @@ module.exports = {
       // <object>: partial webpack config
       config: {
         plugins: [],
-        node: {},
         externals: [],
         entry: './src/ssr.js',
         module: {},

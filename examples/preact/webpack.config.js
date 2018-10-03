@@ -2,7 +2,24 @@ const path = require('path')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const PrerenderPlugin = require('simple-prerender-webpack-plugin')
 
-const getConfig = ({ IS_PRERENDER = false } = {}) => ({
+const forSSR = {
+  compiler: 'simple-prerender-webpack-plugin',
+  parser: {
+    node: {
+      console: false,
+      global: false,
+      process: false,
+      __filename: false,
+      __dirname: false,
+      Buffer: false,
+      setImmediate: false,
+    },
+  },
+}
+
+const sourceDir = path.join(__dirname, 'src')
+
+module.exports = {
   devtool: 'source-map',
   output: {
     chunkFilename: '[id].[contenthash:8].js',
@@ -23,15 +40,16 @@ const getConfig = ({ IS_PRERENDER = false } = {}) => ({
       debug: true,
       writeToDisk: true,
     }),
-  ].filter(Boolean),
+  ],
   module: {
     rules: [
       {
         test: /\.js$/,
         oneOf: [
           {
+            ...forSSR,
+            include: sourceDir,
             loader: 'babel-loader',
-            include: path.join(__dirname, 'src'),
             options: {
               cacheDirectory: true,
               babelrc: false,
@@ -39,14 +57,48 @@ const getConfig = ({ IS_PRERENDER = false } = {}) => ({
                 [
                   require('@dgeibi/babel-preset-react-app'),
                   {
-                    targets: IS_PRERENDER
-                      ? {
-                          node: 'current',
-                        }
-                      : {
-                          browsers: 'last 2 versions',
-                        },
-                    useBuiltIns: IS_PRERENDER ? false : 'usage',
+                    targets: {
+                      node: 'current',
+                    },
+                    pragma: 'h',
+                  },
+                ],
+              ],
+            },
+          },
+          {
+            ...forSSR,
+            loader: 'babel-loader',
+            options: {
+              cacheDirectory: true,
+              babelrc: false,
+              presets: [
+                [
+                  '@babel/preset-env',
+                  {
+                    targets: {
+                      node: 'current',
+                    },
+                    modules: false,
+                  },
+                ],
+              ],
+            },
+          },
+          {
+            loader: 'babel-loader',
+            include: sourceDir,
+            options: {
+              cacheDirectory: true,
+              babelrc: false,
+              presets: [
+                [
+                  require('@dgeibi/babel-preset-react-app'),
+                  {
+                    targets: {
+                      browsers: 'last 2 versions',
+                    },
+                    useBuiltIns: 'usage',
                     pragma: 'h',
                   },
                 ],
@@ -63,6 +115,9 @@ const getConfig = ({ IS_PRERENDER = false } = {}) => ({
                   '@babel/preset-env',
                   {
                     modules: false,
+                    targets: {
+                      browsers: 'last 2 versions',
+                    },
                   },
                 ],
               ],
@@ -70,8 +125,6 @@ const getConfig = ({ IS_PRERENDER = false } = {}) => ({
           },
         ],
       },
-    ].filter(Boolean),
+    ],
   },
-})
-
-module.exports = getConfig
+}
