@@ -20,23 +20,21 @@ module.exports = {
     new PrerenderPlugin({
       entry: './src/app.js',
       filename: '[hash].js',
-      config: {
-        module: {
-          rules: [
-            {
-              test: /\.css$/,
-              loader: 'css-loader/locals',
-            },
-          ],
-        },
-      },
     }),
   ],
   module: {
     rules: [
       {
         test: /\.css$/,
-        use: [MiniCssExtractPlugin.loader, 'css-loader'],
+        oneOf: [
+          {
+            compiler: PrerenderPlugin.compilerName,
+            loader: 'css-loader/locals',
+          },
+          {
+            use: [MiniCssExtractPlugin.loader, 'css-loader'],
+          },
+        ],
       },
     ],
   },

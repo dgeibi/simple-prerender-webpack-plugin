@@ -13,7 +13,7 @@
   "license": "MIT",
   "dependencies": {
     "resolve-from": "^4.0.0",
-    "source-map": "^0.6.1",
+    "source-map": "^0.7.3",
     "webpack-merge": "^4.1.2",
     "webpack-node-externals": "^1.6.0"
   },
