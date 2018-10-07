@@ -78,11 +78,13 @@ module.exports = (env, args) => {
         filename: 'index.html',
         template: './src/index.ejs',
         title: 'React Prerender Demo',
+        cache: false,
       }),
       new HtmlWebpackPlugin({
         filename: 'about/index.html',
         template: './src/index.ejs',
         title: 'React Prerender Demo',
+        cache: false,
       }),
       new PrerenderPlugin({
         entry: './src/ssr.js',
