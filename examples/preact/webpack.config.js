@@ -22,8 +22,8 @@ const sourceDir = path.join(__dirname, 'src')
 module.exports = {
   devtool: 'source-map',
   output: {
-    chunkFilename: '[id].[contenthash:8].js',
-    filename: '[name].[contenthash:8].js',
+    chunkFilename: '[id].js',
+    filename: '[name].js',
   },
   entry: path.join(__dirname, 'src/index.js'),
   plugins: [
