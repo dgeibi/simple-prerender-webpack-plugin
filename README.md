@@ -12,7 +12,7 @@
 ## Install
 
 ```sh
-$ npm install webpack html-webpack-plugin
+$ npm install webpack html-webpack-plugin@next
 $ npm install simple-prerender-webpack-plugin
 ```
 
