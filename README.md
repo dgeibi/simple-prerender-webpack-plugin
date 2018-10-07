@@ -69,9 +69,6 @@ module.exports = {
       // (optional): <boolean> whether write output to disk
       writeToDisk: false,
 
-      // when debug is `true`, plugin will not throw errors when evaluating.
-      debug: false,
-
       // (optional): <object> opts passed to webpack-node-externals
       // see also https://www.npmjs.com/package/webpack-node-externals
       nodeExternalsOptions: {},
